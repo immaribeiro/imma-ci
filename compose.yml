@@ -1,0 +1,206 @@
+version: '3.8'
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: jenkins/Dockerfile
+    # image: jenkins/jenkins:lts-alpine-jdk21
+    container_name: jenkins
+    restart: always
+    user: root
+    ports:
+      - 8080:8080
+      - 50000:50000
+    networks:
+      - ci-network
+    extra_hosts:
+      - gitea.imma.com:192.168.48.4
+    volumes:
+      - /home/ubuntu/jenkins_compose/jenkins_configuration:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./certs:/etc/ssl/certs
+
+  jenkins_slave:
+    image: jenkins/jnlp-slave
+    container_name: jenkins_slave
+    networks:
+      - ci-network
+    extra_hosts:
+      - jenkins.imma.com:192.168.48.5
+    command: -url http://jenkins.imma.com:8080/computer/agent%5F1/jenkins-agent.jnlp 07fdae1da86e8a3840c7ac0645da73b84b6e639734b6ab058caca304b68167d3 agent_1
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+      - $HOME/jnlp_slave:/var/jenkins_home
+
+  sonarqube:
+    build:
+        context: .
+        dockerfile: sonarqube/Dockerfile
+    # image: sonarqube:lts-community
+    container_name: sonarqube
+    depends_on:
+      - db
+    ports:
+      - "9000:9000"
+    networks:
+      - ci-network
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://db:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+    # sysctls:
+    #   - "vm.max_map_count=262144"
+    volumes:
+      - sonarqube_conf:/opt/sonarqube/conf
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+    # command: "rm -rf /opt/sonarqube/data/es8/*.lock"
+    # RUN IN HOST: sudo sysctl -w vm.max_map_count=262144 
+
+  db:
+    image: postgres:16
+    container_name: db
+    networks:
+      - ci-network
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonarqube
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+  
+  gitea:
+    image: gitea/gitea:1.21.3
+    container_name: gitea
+    environment:
+      - USER_UID=1000
+      - USER_GID=1000
+      - GITEA__database__DB_TYPE=postgres
+      - GITEA__database__HOST=db-gitea:5432
+      - GITEA__database__NAME=gitea
+      - GITEA__database__USER=gitea
+      - GITEA__database__PASSWD=gitea
+    restart: always
+    networks:
+      - ci-network
+    extra_hosts:
+      - jenkins.imma.com:192.168.48.3
+    volumes:
+      - gitea:/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "3000:3000"
+      - "222:22"
+    depends_on:
+      - db-gitea
+
+  db-gitea:
+    image: postgres:14
+    container_name: db-gitea
+    restart: always
+    environment:
+      - POSTGRES_USER=gitea
+      - POSTGRES_PASSWORD=gitea
+      - POSTGRES_DB=gitea
+    networks:
+      - ci-network
+    volumes:
+      - postgres_gitea:/var/lib/postgresql/data
+
+  dtrack-apiserver:
+    image: dependencytrack/apiserver
+    deploy:
+      resources:
+        limits:
+          memory: 12288m
+        reservations:
+          memory: 8192m
+      restart_policy:
+        condition: on-failure
+    environment:
+      # Database Properties
+      - ALPINE_DATABASE_MODE=external
+      - ALPINE_DATABASE_URL=jdbc:postgresql://postgres10:5432/dtrack
+      - ALPINE_DATABASE_DRIVER=org.postgresql.Driver
+      - ALPINE_DATABASE_USERNAME=dtrack
+      - ALPINE_DATABASE_PASSWORD=changeme
+      # - ALPINE_DATABASE_POOL_ENABLED=true
+      # - ALPINE_DATABASE_POOL_MAX_SIZE=20
+      # - ALPINE_DATABASE_POOL_MIN_IDLE=10
+      # - ALPINE_DATABASE_POOL_IDLE_TIMEOUT=300000
+      # - ALPINE_DATABASE_POOL_MAX_LIFETIME=600000
+    ports:
+      - '8081:8080'
+    volumes:
+    # Optional volume mount to override default notification publisher templates
+    # - "/host/path/to/template/base/dir:/data/templates"
+      - 'dependency-track:/data'
+    restart: unless-stopped
+
+
+    dtrack-frontend:
+      image: dependencytrack/frontend
+      depends_on:
+        - dtrack-apiserver
+      environment:
+        # The base URL of the API server.
+        # NOTE:
+        #   * This URL must be reachable by the browsers of your users.
+        #   * The frontend container itself does NOT communicate with the API server directly, it just serves static files.
+        #   * When deploying to dedicated servers, please use the external IP or domain of the API server.
+        - API_BASE_URL=http://localhost:8082
+        # - "OIDC_ISSUER="
+        # - "OIDC_CLIENT_ID="
+        # - "OIDC_SCOPE="
+        # - "OIDC_FLOW="
+        # - "OIDC_LOGIN_BUTTON_TEXT="
+        # volumes:
+        # - "/host/path/to/config.json:/app/static/config.json"
+      ports:
+        - "8080:8080"
+      restart: unless-stopped
+
+
+
+  # zap:
+  #   image: owasp/zap2docker-stable
+  #   container_name: zap
+  #   restart: always
+  #   networks:
+  #     - ci-network
+  #   ports:
+  #     - "8081:8080"
+  #     - "8091:8090"
+  #   command: >
+  #     sh -c "zap-webswing.sh" && 
+
+networks:
+  ci-network:
+    name: ci-network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.48.0/24
+
+volumes:
+  sonarqube_conf: 
+  sonarqube_data: 
+  sonarqube_extensions: 
+  sonarqube_logs: 
+  sonarqube_bundled-plugins: 
+  postgresql: 
+  postgresql_data:
+  jenkins_data: 
+  docker_sock: 
+  jenkins-docker-certs: 
+  postgres_gitea:
+  dependency-track: 
+  gitea:
+    driver: local

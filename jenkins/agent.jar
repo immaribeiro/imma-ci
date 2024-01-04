@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<!-- FileName: index.html
+     Language: [en]
+-->
+<!--Head-->
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <meta http-equiv="X-UA-Compatible" content="IE=7" />
+  <title>McAfee Web Gateway - Notification</title>
+  <script src="/mwg-internal/de5fs23hu73ds/files/javascript/sw.js" type="text/javascript" ></script>
+  <link rel="stylesheet" href="/mwg-internal/de5fs23hu73ds/files/THS_default/stylesheet.css" />
+</head>
+<!--/Head-->
+<!--Body-->
+<body onload="swOnLoad();">
+  <table class='bodyTable'>
+    <tr>
+      <td class='bodyData' background='/mwg-internal/de5fs23hu73ds/files/THS_default/img/bg_body.gif'>
+<!--Logo-->
+<table class='logoTable'>
+  <tr>
+    <td class='logoData'>
+      <a href='https://intranet.peopleonline.corp.thales'>
+        <img src='/mwg-internal/de5fs23hu73ds/files/THS_default/img/logo_mwg.png'></a>
+    </td>
+  </tr>
+</table>
+<!--/Logo-->
+<!--Contents-->
+<!--Title-->
+<table class='titleTable' background='/mwg-internal/de5fs23hu73ds/files/THS_default/img/bg_navbar.jpg'>
+  <tr>
+    <td class='titleData'>
+     	Pending Website Categorization
+    </td>
+    <td class='titleData'>
+     	Le site que vous essayez d'atteindre est non catégorisé, c'est 
+    <br>
+	pour cette raison qu'il est bloqué par Thales.
+    </td>
+  </tr>
+</table>
+<!--/Title-->
+<!--Content-->
+<table class="contentTable">
+  <tr align="center">
+    <td class="contentData">
+    <img src='/mwg-internal/de5fs23hu73ds/files/THS_default/img/flag_uk.gif'>
+    </td>
+    <td class="contentData">
+    <img src='/mwg-internal/de5fs23hu73ds/files/THS_default/img/flag_fr.gif'>
+    </td>
+  </tr>  
+  <tr>
+    <td class="contentData">
+    <br>
+	Access to a website that may harm the Group's image or security is not allowed. As the
+    <br>
+	requested website is not categorized yet, its access is not authorized.
+    <br>
+    <br>
+	We have made an automatic categorization request to the editor of the filtering solution for you.
+    <br>
+    <br>
+	If you want to accelerate this process, you can make a categorization suggestion to the editor at
+    <br>
+	<a href="https://sitelookup.mcafee.com/">Check Single URL (sitelookup.mcafee.com)</a>. The procedure is described in the <a href="https://kiss.service-now.com/esc?id=kb_article_view&sysparm_article=KB0019195">Internet Access FAQ Page</a>.
+    </td>
+    </td>
+    <td class="contentData">
+    <br>
+	L'accès à un site web pouvant nuire à l'image ou à la sécurité du Groupe n'est pas autorisé. Le
+    <br>
+	site web demandé n'étant pas encore catégorisé, son accès n'est pas encore autorisé.
+    <br>
+    <br>
+	Nous avons effectué pour vous une demande automatique de catégorisation vers l'éditeur de la 
+    <br>	
+	solution de filtrage.
+    <br>
+    <br>
+	Vous pouvez, si vous souhaitez accélérer ce processus, faire une suggestion de catégorisation à
+    <br>
+	l'éditeur sur le site <a href="https://sitelookup.mcafee.com/">Check Single URL (sitelookup.mcafee.com)</a>. La procédure est décrite dans la <a href="https://kiss.service-now.com/esc?id=kb_article_view&sysparm_article=KB0019164">page FAQ
+    <br>
+	de l'accès Internet</a>.
+    <br>
+    </td>
+  </tr>
+</table>
+
+<!--Info-->
+<table class="infoTable">
+  <tr>
+    <td class="infoData">
+    <br>
+      <u> Informations techniques utiles à votre help desk :</u>
+    <br>
+    <br>
+      <b>URL: </b><script type="text/javascript">break_line("http://localhost:8080/jnlpJars/agent.jar");</script>
+    <br>
+    <br>
+    </td>
+  </tr>
+</table>
+<!--/Info-->
+<!--/Contents-->
+<!--Policy-->
+<!--
+<table class='policyTable'>
+  <tr>
+    <td class='policyHeading'>
+      <hr>
+      Company Acceptable Use Policy
+    </td>
+  </tr>
+  <tr>
+    <td class='policyData'>
+      This is an optional acceptable use disclaimer that appears on every page. You may change the wording or remove this section entirely in index.html.
+    </td>
+  </tr>
+</table>
+-->
+<!--/Policy-->
+<!--Foot-->
+<table class='footTable'>
+  <tr>
+    <td class='helpDeskData' background='/mwg-internal/de5fs23hu73ds/files/THS_default/img/bg_navbar.jpg'>
+      For assistance, please contact your Service Desk.
+    </td>
+  </tr>
+  <tr>
+    <td class='footData'>
+      <span id="time">2023-12-31 02:43:19</span> | THSDC1INGPRX17P | CN=AN008107,OU=APPLICATION,OU=Service accounts,OU=ELA,DC=globaldir,DC=infra,DC=gts (10.48.201.210)
+      <br />
+      curl/7.81.0
+    </td>
+  </tr>
+</table>
+<!--/Foot-->
+      </td>
+    </tr>
+  </table>
+</body>
+<!--/Body-->
+</html>
