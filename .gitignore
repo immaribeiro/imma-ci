@@ -1,1 +1,7 @@
 certs/
+tree_authoriedkey
+*.ppk
+*.ssh/
+ssh/*
+*/ssh/*
+exported_OpenSSH_key
