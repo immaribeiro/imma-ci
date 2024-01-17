@@ -51,14 +51,12 @@ services:
       SONAR_JDBC_USERNAME: sonar
       SONAR_JDBC_PASSWORD: sonar
       ES_JAVA_OPTS: "-Xms1g -Xmx1g"
-    # sysctls:
-    #   - "vm.max_map_count=262144"
     volumes:
       - sonarqube_conf:/opt/sonarqube/conf
       - sonarqube_data:/opt/sonarqube/data
       - sonarqube_logs:/opt/sonarqube/logs
       - sonarqube_bundled-plugins:/opt/sonarqube/lib/bundled-plugins
-    # command: "rm -rf /opt/sonarqube/data/es8/*.lock"
+
     # RUN IN HOST: sudo sysctl -w vm.max_map_count=262144 
 
   db:
@@ -115,6 +113,7 @@ services:
 
   dtrack-apiserver:
     image: dependencytrack/apiserver
+    container_name: dtrack-api
     deploy:
       resources:
         limits:
@@ -144,27 +143,28 @@ services:
     restart: unless-stopped
 
 
-    dtrack-frontend:
-      image: dependencytrack/frontend
-      depends_on:
-        - dtrack-apiserver
-      environment:
-        # The base URL of the API server.
-        # NOTE:
-        #   * This URL must be reachable by the browsers of your users.
-        #   * The frontend container itself does NOT communicate with the API server directly, it just serves static files.
-        #   * When deploying to dedicated servers, please use the external IP or domain of the API server.
-        - API_BASE_URL=http://localhost:8082
-        # - "OIDC_ISSUER="
-        # - "OIDC_CLIENT_ID="
-        # - "OIDC_SCOPE="
-        # - "OIDC_FLOW="
-        # - "OIDC_LOGIN_BUTTON_TEXT="
-        # volumes:
-        # - "/host/path/to/config.json:/app/static/config.json"
-      ports:
-        - "8080:8080"
-      restart: unless-stopped
+  dtrack-frontend:
+    image: dependencytrack/frontend
+    container_name: dtrack-frontend
+    depends_on:
+      - dtrack-apiserver
+    environment:
+      # The base URL of the API server.
+      # NOTE:
+      #   * This URL must be reachable by the browsers of your users.
+      #   * The frontend container itself does NOT communicate with the API server directly, it just serves static files.
+      #   * When deploying to dedicated servers, please use the external IP or domain of the API server.
+      - API_BASE_URL=http://localhost:8082
+      # - "OIDC_ISSUER="
+      # - "OIDC_CLIENT_ID="
+      # - "OIDC_SCOPE="
+      # - "OIDC_FLOW="
+      # - "OIDC_LOGIN_BUTTON_TEXT="
+      # volumes:
+      # - "/host/path/to/config.json:/app/static/config.json"
+    ports:
+      - "8082:8080"
+    restart: unless-stopped
 
 
 
